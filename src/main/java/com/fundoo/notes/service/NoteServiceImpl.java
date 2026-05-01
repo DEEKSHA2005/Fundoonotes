@@ -6,6 +6,8 @@ import com.fundoo.notes.entity.User;
 import com.fundoo.notes.repository.NoteRepository;
 import com.fundoo.notes.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +17,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoteServiceImpl implements NoteService {
 
+    private static final Logger log = LoggerFactory.getLogger(NoteServiceImpl.class);
+
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
 
+    // ================= CREATE NOTE =================
     @Override
     public String createNote(NoteRequest request) {
 
-        // Get logged-in user email from JWT
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        // Fetch user
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        log.info("Creating note for user: {}", email);
 
-        // Create note
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", email);
+                    return new RuntimeException("User not found");
+                });
+
         Note note = new Note();
         note.setTitle(request.getTitle());
         note.setContent(request.getContent());
@@ -37,25 +44,26 @@ public class NoteServiceImpl implements NoteService {
 
         noteRepository.save(note);
 
+        log.info("Note created successfully for userId: {}", user.getId());
+
         return "Note Created Successfully";
     }
 
+    // ================= UPDATE NOTE =================
     @Override
     public String updateNote(Long id, NoteRequest request) {
 
-        // 🔥 get email from JWT
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        // 🔥 fetch user
+        log.info("Updating note id: {} for user: {}", id, email);
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 🔥 fetch note securely
         Note note = noteRepository.findByIdAndUserId(id, user.getId())
                 .orElseThrow(() -> new RuntimeException("Note not found or access denied"));
 
-        // 🔥 update fields
         if (request.getTitle() != null)
             note.setTitle(request.getTitle());
 
@@ -64,59 +72,62 @@ public class NoteServiceImpl implements NoteService {
 
         noteRepository.save(note);
 
+        log.info("Note updated successfully: {}", id);
+
         return "Note Updated Successfully";
     }
 
+    // ================= DELETE NOTE =================
     @Override
     public String deleteNote(Long id) {
 
-        // 🔥 get email from JWT
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        // 🔥 fetch user
+        log.info("Deleting note id: {} for user: {}", id, email);
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 🔥 fetch note securely
         Note note = noteRepository.findByIdAndUserId(id, user.getId())
                 .orElseThrow(() -> new RuntimeException("Note not found or access denied"));
 
-        // 🔥 soft delete
         note.setTrashed(true);
 
         noteRepository.save(note);
 
+        log.info("Note moved to trash: {}", id);
+
         return "Note moved to trash";
     }
 
+    // ================= GET ALL NOTES =================
     @Override
     public List<Note> getNotes() {
 
-        // 🔥 get email from JWT
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        // 🔥 fetch user
+        log.info("Fetching notes for user: {}", email);
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 🔥 fetch notes
         return noteRepository.findByUserId(user.getId());
     }
 
+    // ================= GET NOTE BY ID =================
     @Override
     public Note getNoteById(Long id) {
 
-        // 🔥 get email from JWT
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        // 🔥 fetch user
+        log.info("Fetching note id: {} for user: {}", id, email);
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 🔥 fetch note securely
         return noteRepository.findByIdAndUserId(id, user.getId())
                 .orElseThrow(() -> new RuntimeException("Note not found or access denied"));
     }

@@ -3,6 +3,7 @@ package com.fundoo.notes.service;
 import com.fundoo.notes.dto.LoginRequest;
 import com.fundoo.notes.dto.RegisterRequest;
 import com.fundoo.notes.entity.User;
+import com.fundoo.notes.exception.ResourceNotFoundException;
 import com.fundoo.notes.repository.UserRepository;
 import com.fundoo.notes.util.JwtUtil;
 
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public String login(LoginRequest request) {
 
         User user = repository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!encoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
