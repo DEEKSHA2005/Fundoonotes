@@ -25,4 +25,20 @@ public class NoteController {
     public List<Note> getNotes() {
         return noteService.getNotes();
     }
+
+    @GetMapping("/{id}")
+    public Note getNoteById(@PathVariable Long id) {
+        return noteService.getNoteById(id);
+    }
+
+    @PutMapping("/{id}")
+    public String updateNote(@PathVariable Long id,
+                             @RequestBody NoteRequest request) {
+        return noteService.updateNote(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteNote(@PathVariable Long id) {
+        return noteService.deleteNote(id);
+    }
 }
