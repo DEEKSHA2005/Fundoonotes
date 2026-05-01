@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class NoteServiceImpl implements NoteService {
@@ -36,5 +38,20 @@ public class NoteServiceImpl implements NoteService {
         noteRepository.save(note);
 
         return "Note Created Successfully";
+    }
+
+    @Override
+    public List<Note> getNotes() {
+
+        // 🔥 get email from JWT
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        // 🔥 fetch user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 🔥 fetch notes
+        return noteRepository.findByUserId(user.getId());
     }
 }

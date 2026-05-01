@@ -1,10 +1,13 @@
 package com.fundoo.notes.controller;
 
 import com.fundoo.notes.dto.NoteRequest;
+import com.fundoo.notes.entity.Note;
 import com.fundoo.notes.service.NoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -16,5 +19,10 @@ public class NoteController {
     @PostMapping
     public String createNote(@Valid @RequestBody NoteRequest request) {
         return noteService.createNote(request);
+    }
+
+    @GetMapping
+    public List<Note> getNotes() {
+        return noteService.getNotes();
     }
 }
