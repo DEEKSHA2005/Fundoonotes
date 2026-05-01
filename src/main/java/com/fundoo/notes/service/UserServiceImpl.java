@@ -18,6 +18,7 @@ public class UserServiceImpl implements UserService {
     private final JwtUtil jwtUtil;
     private final UserRepository repository;
     private final BCryptPasswordEncoder encoder;
+    private final RedisService redisService;
 
     @Override
     public String register(RegisterRequest request) {
@@ -36,12 +37,16 @@ public class UserServiceImpl implements UserService {
     public String login(LoginRequest request) {
 
         User user = repository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!encoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
 
-        return jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        redisService.save(user.getEmail(), token);
+
+        return token;
     }
 }
