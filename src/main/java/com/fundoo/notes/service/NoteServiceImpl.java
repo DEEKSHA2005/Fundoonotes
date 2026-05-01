@@ -68,6 +68,29 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    public String deleteNote(Long id) {
+
+        // 🔥 get email from JWT
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        // 🔥 fetch user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 🔥 fetch note securely
+        Note note = noteRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new RuntimeException("Note not found or access denied"));
+
+        // 🔥 soft delete
+        note.setTrashed(true);
+
+        noteRepository.save(note);
+
+        return "Note moved to trash";
+    }
+
+    @Override
     public List<Note> getNotes() {
 
         // 🔥 get email from JWT
