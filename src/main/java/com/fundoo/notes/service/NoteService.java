@@ -8,4 +8,5 @@ import java.util.List;
 public interface NoteService {
     String createNote(NoteRequest request);
     List<Note> getNotes();
+    Note getNoteById(Long id);
 }

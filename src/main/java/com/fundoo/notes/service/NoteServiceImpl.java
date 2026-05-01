@@ -54,4 +54,20 @@ public class NoteServiceImpl implements NoteService {
         // 🔥 fetch notes
         return noteRepository.findByUserId(user.getId());
     }
+
+    @Override
+    public Note getNoteById(Long id) {
+
+        // 🔥 get email from JWT
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        // 🔥 fetch user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 🔥 fetch note securely
+        return noteRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new RuntimeException("Note not found or access denied"));
+    }
 }
