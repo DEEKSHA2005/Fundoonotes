@@ -21,6 +21,7 @@ public class NoteServiceImpl implements NoteService {
 
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
+    private final RabbitMQProducer producer;
 
     // ================= CREATE NOTE =================
     @Override
@@ -45,6 +46,8 @@ public class NoteServiceImpl implements NoteService {
         noteRepository.save(note);
 
         log.info("Note created successfully for userId: {}", user.getId());
+
+        producer.sendMessage("New note created by: " + user.getEmail());
 
         return "Note Created Successfully";
     }
