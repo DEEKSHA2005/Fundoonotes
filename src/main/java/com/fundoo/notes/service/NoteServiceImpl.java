@@ -41,6 +41,33 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    public String updateNote(Long id, NoteRequest request) {
+
+        // 🔥 get email from JWT
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        // 🔥 fetch user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 🔥 fetch note securely
+        Note note = noteRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new RuntimeException("Note not found or access denied"));
+
+        // 🔥 update fields
+        if (request.getTitle() != null)
+            note.setTitle(request.getTitle());
+
+        if (request.getContent() != null)
+            note.setContent(request.getContent());
+
+        noteRepository.save(note);
+
+        return "Note Updated Successfully";
+    }
+
+    @Override
     public List<Note> getNotes() {
 
         // 🔥 get email from JWT
