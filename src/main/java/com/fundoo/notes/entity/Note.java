@@ -2,6 +2,8 @@ package com.fundoo.notes.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "notes")
 public class Note {
@@ -17,6 +19,9 @@ public class Note {
 
     @Column(nullable = false)
     private String content;
+
+    private LocalDateTime reminderTime;
+    private boolean reminderSent = false;
 
     // 🔥 Flags
     private boolean isPinned = false;
@@ -55,6 +60,22 @@ public class Note {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public LocalDateTime getReminderTime() {
+        return reminderTime;
+    }
+
+    public void setReminderTime(LocalDateTime reminderTime) {
+        this.reminderTime = reminderTime;
+    }
+
+    public boolean isReminderSent() {
+        return reminderSent;
+    }
+
+    public void setReminderSent(boolean reminderSent) {
+        this.reminderSent = reminderSent;
     }
 
     public boolean isPinned() {
