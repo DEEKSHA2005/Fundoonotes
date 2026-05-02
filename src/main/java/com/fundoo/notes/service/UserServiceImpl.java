@@ -8,7 +8,7 @@ import com.fundoo.notes.repository.UserRepository;
 import com.fundoo.notes.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +17,7 @@ public class UserServiceImpl implements UserService {
 
     private final JwtUtil jwtUtil;
     private final UserRepository repository;
-    private final BCryptPasswordEncoder encoder;
+    private final PasswordEncoder encoder;
     private final RedisService redisService;
 
     @Override
